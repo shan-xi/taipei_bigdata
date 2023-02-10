@@ -16,7 +16,7 @@ func main() {
 	}
 
 	router := gin.Default()
-	router.GET("/project/:id", env.getMarkersByProjectID)
+	router.GET("/project/:project_id", env.getMarkersByProjectID)
 
-	router.Run("localhost:8081")
+	router.Run("192.168.117.104:8081")
 }

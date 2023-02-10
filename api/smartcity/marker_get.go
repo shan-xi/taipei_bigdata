@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
@@ -11,34 +10,31 @@ import (
 	_ "github.com/lib/pq"
 )
 
-type marker struct {
-	Project_id string `json:"project_id"`
-	ID         string `json:"id"`
-	Name       string `json:"name"`
-	Address    string `json:"address"`
-	Lat        string `json:"lat"`
-	Lng        string `json:"lng"`
-	Locname    string `json:"locname"`
-	Img        string `json:"img"`
-	Intro      string `json:"intro"`
-	Icon       string `json:"icon"`
-	Type       string `json:"type"`
-}
-
 func (env Env) getMarkersByProjectID(c *gin.Context) {
 	project_id := c.Param("project_id")
-	log.Print(project_id)
-	var name, address string
-	q := "SELECT project_id, name, address FROM marker WHERE project_id=2"
-	row := env.DB.QueryRow(q)
-	err := row.Scan(&project_id, &name, &address)
-	switch err {
-	case sql.ErrNoRows:
-		log.Printf("no rows are present for marker with project_id: %v", project_id)
-		makeGinResponse(c, http.StatusBadRequest, err.Error())
-	default:
-		e := fmt.Sprintf("error: %v occurred while reading the databse for marker record with id: %v", err, project_id)
+	var id, name, address, lat, lng, locname, img, intro, icon, ty string
+	q := `SELECT project_id, id, name, address, lat, lng, locname, img, intro, icon, type as ty FROM marker WHERE project_id=$1;`
+	rows, err := env.DB.Query(q, project_id)
+	if err != nil {
+		e := fmt.Sprintf("error: %v occurred while reading the databse for marker record with project_id: %v", err, project_id)
 		log.Println(e)
 		makeGinResponse(c, http.StatusInternalServerError, err.Error())
 	}
+	defer rows.Close()
+
+	markers := make([]Marker, 0)
+	for rows.Next() {
+		err := rows.Scan(&project_id, &id, &name, &address, &lat, &lng, &locname, &img, &intro, &icon, &ty)
+		if err != nil {
+			e := fmt.Sprintf("error: %v occurred while retrieving data for marker record with project_id: %v", err, project_id)
+			log.Println(e)
+			makeGinResponse(c, http.StatusInternalServerError, err.Error())
+		}
+		markers = append(markers, Marker{project_id, id, name, address, lat, lng, locname, img, intro, icon, ty})
+	}
+	err = rows.Err()
+	if err != nil {
+		log.Fatal(err)
+	}
+	c.JSON(http.StatusOK, markers)
 }

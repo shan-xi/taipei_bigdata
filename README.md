@@ -26,7 +26,9 @@ https://smartcity.taipei/projmap/0?lang=zh-Hant
 3. run go api application
 
 ```
-cd /api
+cd /api/smartcity
+
+change hostname to yours in main.go
 
 go run .
 

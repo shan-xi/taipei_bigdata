@@ -14,25 +14,33 @@ https://smartcity.taipei/projmap/0?lang=zh-Hant
 
 ## Getting started 
 
-1. initialize ariflow 
+1. airflow setup 
 
-`docker-compose up airflow-init`
+```
+cd /airflow
 
-2. spin up all application
+#initialize ariflow 
 
-`docker-compose up`
+docker-compose up airflow-init
 
+#spin up all application
 
-3. run go api application
+docker-compose up
+```
+
+2. run go api application
 
 ```
 cd /api/smartcity
 
-change hostname to yours in main.go
-
 go run .
 
-Get marker by project_id API => http://{hostname}:8081/project/:project_id
+#use ngrok to expose the localhost port to the internet
+
+ngrok http 8081
+
+example: 
+Get marker by project_id API => hhttps://8d2a-2001-b400-e403-9be-90e9-378e-37b6-ed12.jp.ngrok.io/project/:project_id
 please refer to https://smartcity.taipei/projmap/0?lang=zh-Hant for project_id information
 ```
 

@@ -82,4 +82,4 @@ with DAG(dag_id="smarttaipei_dag",
         task_id="smarttaipei",
         python_callable=get_smarttaipei_data)
 
-task1
+    task1

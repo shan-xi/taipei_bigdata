@@ -9,6 +9,8 @@ from sqlalchemy import Column
 from sqlalchemy import Table
 from sqlalchemy import Integer
 from sqlalchemy import String
+import traceback
+import logging
 
 conn_url = 'postgresql+psycopg2://airflow:airflow@postgres:5432/airflow'
 engine = create_engine(conn_url)
@@ -32,8 +34,6 @@ metadata_obj.create_all(engine)
 
 
 def get_smarttaipei_data():
-    import traceback
-    import logging
     conn = engine.connect()
     conn.execute(marker.delete())
     project_id_map = {
@@ -49,7 +49,6 @@ def get_smarttaipei_data():
     }
     for category_id in range(1, 10):
         response = requests.get(f'https://smartcity.taipei/xml.xml?category={category_id}')
-        response.encoding = response.apparent_encoding
         data = xmltodict.parse(response.content, force_list=True)
         for marker_data in data['markers']:
             for point in marker_data['marker']:
